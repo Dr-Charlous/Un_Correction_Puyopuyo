@@ -100,7 +100,7 @@ public class MainGame : MonoBehaviour
     {
         //Instance des puyos
         int number = Random.Range(0, _puyoPrefab.Length);
-        number = 0;
+        //number = 0;
         GameObject puyo = Instantiate(_puyoPrefab[number], GridToWorld(_gridSize.x / 2, _gridSize.y - 1), Quaternion.identity);
         puyo.GetComponent<PuyoController>().Initialize(_gridSize.x / 2, _gridSize.y - 1);
 
@@ -112,7 +112,7 @@ public class MainGame : MonoBehaviour
         _puyosPosition[_puyoActive.GridPosition.x, _puyoActive.GridPosition.y] = _puyoActive;
         _puyosInGrid[_puyoActive.GridPosition.x, _puyoActive.GridPosition.y] = _puyoActive;
 
-        ComboCheck( _puyoActive.GridPosition.x, _puyoActive.GridPosition.y,  _puyoActive.Color, 0);
+        ComboCheck(_puyoActive.GridPosition.x, _puyoActive.GridPosition.y, _puyoActive.Color, 0);
 
         int combo = 0;
 
@@ -122,6 +122,18 @@ public class MainGame : MonoBehaviour
             {
                 if (_puyosPassed[x, y])
                     combo++;
+            }
+        }
+
+        if (combo >= 4)
+        {
+            for (int y = 0; y < _gridSize.y; y++)
+            {
+                for (int x = 0; x < _gridSize.x; x++)
+                {
+                    if (_puyosPassed[x, y])
+                        Destroy(_puyosInGrid[x, y].gameObject);
+                }
             }
         }
 
@@ -149,11 +161,11 @@ public class MainGame : MonoBehaviour
         }
     }
 
-    int ComboCheck( int x, int y, PuyoController.ColorPuyo color, int comboValue)
+    int ComboCheck(int x, int y, PuyoController.ColorPuyo color, int comboValue)
     {
         if (x < 0 || x >= _gridSize.x || y < 0 || y >= _gridSize.y)
             return 0;
-        if (_puyosInGrid[x, y] == null || _puyosInGrid[x, y].Color != color || _puyosPassed[x, y] )
+        if (_puyosInGrid[x, y] == null || _puyosInGrid[x, y].Color != color || _puyosPassed[x, y])
             return 0;
 
         comboValue++;
@@ -167,7 +179,7 @@ public class MainGame : MonoBehaviour
         int up = ComboCheck(x, y + 1, color, comboValue);
         int down = ComboCheck(x, y - 1, color, comboValue);
 
-        return Mathf.Max( comboValue,  right , left , up , down );
+        return Mathf.Max(comboValue, right, left, up, down);
     }
 
     private void OnDrawGizmos()
